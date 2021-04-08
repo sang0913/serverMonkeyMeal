@@ -38,6 +38,7 @@ module.exports = function(app){
                                 ConfirmPassword:hash,
                                 Active: true,
                                 RegisterDate: Date.now()
+                                
                             });
 
                             newUser.save(function(err){
@@ -84,7 +85,7 @@ module.exports = function(app){
                                     Mobile: data.Mobile,
                                     Address: data.Address,
                                     Active: data.Active,
-                                    RegisterDate: Date.now()
+                                    RegisterDate: Date.RegisterDate
                                 }, privateKey, {expiresIn:Math.floor(Date.now()/1000)+60*60*24*30*3}, function(err, token){
                                     if(err){
                                         res.json({kq:0, errMsg:err});
