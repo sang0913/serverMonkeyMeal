@@ -9,43 +9,42 @@ var jwt = require("jsonwebtoken");
 var privateKey = "*(&123423324234h234a2342m.vn2adhja";
 
 
-module.exports = function(app){
-    
-    app.post("/register", function(req, res){
+module.exports = function (app) {
+
+    app.post("/register", function (req, res) {
         console.log("Post register");
-        console.log( req.body );
-        // Check avaible Username/Email
+        console.log(req.body);
         User.find({
-            "$or": [{"Username":req.body.Username}, {"Email":req.body.Email}]
-        }, function(err, data){
-            if(data.length==0){
+            "$or": [{ "Username": req.body.Username }, { "Email": req.body.Email }]
+        }, function (err, data) {
+            if (data.length == 0) {
 
                 //Ma hoa password voi Bcryptjs
-                bcrypt.genSalt(10, function(err, salt) {
-                    bcrypt.hash(req.body.Password, salt, function(err, hash) {
-                        if(err){
-                            res.json({"kq":0, "errMsg":"Password encode error!"});
-                        }else{
+                bcrypt.genSalt(10, function (err, salt) {
+                    bcrypt.hash(req.body.Password, salt, function (err, hash) {
+                        if (err) {
+                            res.json({ "kq": 0, "errMsg": "Password encode error!" });
+                        } else {
 
                             // Save user to Mongo Server
                             var newUser = User({
-                                Username:   req.body.Username,
-                                Email:   req.body.Email,
-                                Mobile    :   req.body.Mobile,
-                                Address   :   req.body.Address,
-                                RegisterDate   :   Date.now(),
-                                Password :   hash,
-                                ConfirmPassword:hash,
+                                Username: req.body.Username,
+                                Email: req.body.Email,
+                                Mobile: req.body.Mobile,
+                                Address: req.body.Address,
+                                RegisterDate: Date.now(),
+                                Password: hash,
+                                ConfirmPassword: hash,
                                 Active: true,
                                 RegisterDate: Date.now()
-                                
+
                             });
 
-                            newUser.save(function(err){
-                                if(err){
-                                    res.json({"kq":0, "errMsg":"Mongo save user error"});
-                                }else{
-                                    res.json({"kq":1, "errMsg":"User register successfully."});
+                            newUser.save(function (err) {
+                                if (err) {
+                                    res.json({ "kq": 0, "errMsg": "Mongo save user error" });
+                                } else {
+                                    res.json({ "kq": 1, "errMsg": "User register successfully." });
                                 }
                             });
 
@@ -53,29 +52,28 @@ module.exports = function(app){
                     });
                 });
 
-            }else{
-                res.json({"kq":0, "errMsg":"Email/Username is not availble."});
+            } else {
+                res.json({ "kq": 0, "errMsg": "Email/Username is not availble." });
             }
         });
     });
-
-    app.post("/login", function(req, res){
+    app.post("/login", function (req, res) {
         // kichi 123
         // check Username co ton tai
-        User.findOne({Username:req.body.Username}, function(err, data){
-            if(err){
-                res.json({kq:0, errMsg:err});
-            }else{
-                if(!data){
-                    res.json({kq:0, errMsg:"Username chua dang ki"});
-                }else{
+        User.findOne({ Username: req.body.Username }, function (err, data) {
+            if (err) {
+                res.json({ kq: 0, errMsg: err });
+            } else {
+                if (!data) {
+                    res.json({ kq: 0, errMsg: "Username chua dang ki" });
+                } else {
 
                     // Check Password
-                    bcrypt.compare(req.body.Password, data.Password, function(err, resUser){
-                        if(err){
-                            res.json({kq:0, errMsg:err});
-                        }else{
-                            if(resUser===true){
+                    bcrypt.compare(req.body.Password, data.Password, function (err, resUser) {
+                        if (err) {
+                            res.json({ kq: 0, errMsg: err });
+                        } else {
+                            if (resUser === true) {
 
                                 //Login thanh cong
                                 jwt.sign({
@@ -85,11 +83,11 @@ module.exports = function(app){
                                     Mobile: data.Mobile,
                                     Address: data.Address,
                                     Active: data.Active,
-                                    RegisterDate: Date.RegisterDate
-                                }, privateKey, {expiresIn:Math.floor(Date.now()/1000)+60*60*24*30*3}, function(err, token){
-                                    if(err){
-                                        res.json({kq:0, errMsg:err});
-                                    }else{
+                                    RegisterDate: Date.now()
+                                }, privateKey, { expiresIn: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30 * 3 }, function (err, token) {
+                                    if (err) {
+                                        res.json({ kq: 0, errMsg: err });
+                                    } else {
 
                                         // Save Tokens
                                         var currenToken = new Token({
@@ -99,18 +97,18 @@ module.exports = function(app){
                                             State: true
                                         });
 
-                                        currenToken.save(function(err){
-                                            if(err){
-                                                res.json({kq:0, errMsg:err});
-                                            }else{
-                                                res.json({kq:1, Token:token});
+                                        currenToken.save(function (err) {
+                                            if (err) {
+                                                res.json({ kq: 0, errMsg: err });
+                                            } else {
+                                                res.json({ kq: 1, Token: token });
                                             }
                                         });
                                     }
                                 });
 
-                            }else{
-                                res.json({kq:0, errMsg:"Sai password."});
+                            } else {
+                                res.json({ kq: 0, errMsg: "Sai password." });
                             }
                         }
                     });
@@ -121,23 +119,24 @@ module.exports = function(app){
 
     });
 
-    app.post("/verifyToken", function(req, res){
-        Token.findOne({Token:req.body.Token, State:true}).select("_id").lean().then(result=>{
-            if(!result){
-                res.json({kq:0, errMsg:"Error Token"});
-            }else{
-    
-                jwt.verify(req.body.Token, privateKey, function(err, decoded) {
-                    if(!err && decoded !== undefined ){
-                        res.json({kq:1, User:decoded});
-                    }else{
-                        res.json({kq:0, errMsg:"Token loi."});
+    app.post("/verifyToken", function (req, res) {
+        Token.findOne({ Token: req.body.Token, State: true }).select("_id").lean().then(result => {
+            if (!result) {
+                res.json({ kq: 0, errMsg: "Error Token" });
+            } else {
+
+                jwt.verify(req.body.Token, privateKey, function (err, decoded) {
+                    if (!err && decoded !== undefined) {
+                        res.json({ kq: 1, User: decoded });
+                    } else {
+                        res.json({ kq: 0, errMsg: "Token loi." });
                     }
                 });
             }
-        });    
+        });
     });
 
+   
     app.post("/logout", function(req, res){
         Token.updateOne({Token:req.body.Token},{State:false}, function(err){
             if(err){
@@ -146,6 +145,8 @@ module.exports = function(app){
                 res.json({kq:1, errMsg:"Logout successfully."});
             }
         });
-    });
-
+    })
 }
+
+
+
