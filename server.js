@@ -9,7 +9,7 @@ app.listen(3000);
 
 //Mongoose
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://sang09133:sang09133@cluster0.bbqyd.mongodb.net/MonkeyMeal?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true},function(err){
+mongoose.connect('mongodb+srv://sang09133:sang09133@cluster0.bbqyd.mongodb.net/MonkeyMeal?retryWrites=true&w=majority', {useNewUrlParser: true, useUnifiedTopology: true , useFindAndModify:false},function(err){
     if(err){
         console.log("mongodb connect err" + err)
     }

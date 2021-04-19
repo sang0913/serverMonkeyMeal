@@ -7,14 +7,14 @@ module.exports = function(app){
             Country: req.body.Country,
             Type: req.body.Type,
             Image:req.body.Image,
-       
+           
         
         });
         newFood.save(function(err){
             if(err){
-                res.json({"kq":0, "errMsg":"Mongo save newFood error"});
+                res.json({kq:0, errMsg: err});
             }else{
-                res.json({"kq":1, "errMsg":"newFood add successfully."});
+                res.json({kq:1, errMsg :"newFood add successfully."});
             }
         });
 
@@ -29,5 +29,25 @@ module.exports = function(app){
         });
     });
 
+    app.post("/FoodCountry/update", function(req, res){
+        FoodCountry.findByIdAndUpdate(req.body.FoodCountryID, {FoodName: req.body.FoodName}, function(err){
+            if(err){
+                res.json({kq:0, errMsg:err});
+            }else{
+                res.json({kq:1 , errMsg: "Update successfully!"});
+            }
+        });
+    });
+
+    app.post("/FoodCountry/delete", function(req, res){
+        FoodCountry.findByIdAndDelete(req.body.FoodCountryID, function(err){
+            if(err){
+                res.json({kq:0, errMsg:err});
+            }else{
+                res.json({kq:1,errMsg: "Delete successfully!"});
+            }
+        });
+    });
 }
+
 
