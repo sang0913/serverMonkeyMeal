@@ -26,3 +26,4 @@ app.use(bodyParser.urlencoded({ extended: false }));
 require("./Routes/Account")(app);
 require("./Routes/FileManager")(app);
 require("./Routes/FoodCountry")(app);
+require("./Routes/Restaurents")(app);
