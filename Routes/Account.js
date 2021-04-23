@@ -146,6 +146,16 @@ module.exports = function (app) {
             }
         });
     })
+    app.post("/User", function(req, res){
+        User.find(function(err, data){
+            if(err){
+                res.json({kq:0, errMsg:err});
+            }else{
+                res.json({kq:1, ListUser:data});
+            }
+        });
+    });
+
 }
 
 

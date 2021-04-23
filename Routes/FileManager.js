@@ -12,7 +12,7 @@ var storage = multer.diskStorage({
 var upload = multer({
     storage: storage,
     fileFilter: function(req, file, cb){
-        if( file.mimetype=="image/bmp" || 
+        if( file.mimetype=="image/svg" || 
             file.mimetype=="image/png" ||
             file.mimetype=="image/jpeg" ||
             file.mimetype=="image/jpg" 

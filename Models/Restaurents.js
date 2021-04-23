@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const restaurentSchema = new mongoose.Schema({
-    FoodName: String,
+    Name: String,
     Country: String,
     Category: String,
     Image : String,
-   
+
    
 });
 
